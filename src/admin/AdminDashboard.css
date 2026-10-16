@@ -1,4 +1,3 @@
-
 /* =====================================================
    LITTLEWONDERS ADMIN DASHBOARD
    Clean, elegant, responsive design
@@ -75,18 +74,24 @@
   border-radius: 20px;
   box-shadow: 0 18px 55px rgba(58, 55, 43, 0.08);
 }
-
 .admin-login-logo {
-  width: 54px;
-  height: 54px;
+  width: 100%;
+  height: 80px;
   margin-bottom: 23px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 15px;
-  background: var(--admin-sage-light);
-  color: var(--admin-sage-dark);
-  font-size: 23px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #fffdf9;
+  /* border: 1px solid var(--admin-border); */
+}
+
+.admin-login-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .admin-eyebrow {
@@ -103,6 +108,7 @@
   font-size: 36px;
   font-weight: 600;
   letter-spacing: -1.3px;
+  text-align: center;
 }
 
 .admin-login-card h1 span {
@@ -138,7 +144,9 @@
   background: #fffaf5;
   color: var(--admin-text);
   font-size: 13px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .admin-login-card > input:focus,
@@ -176,7 +184,9 @@
   color: #fff;
   font-size: 13px;
   font-weight: 600;
-  transition: background 0.2s, transform 0.2s;
+  transition:
+    background 0.2s,
+    transform 0.2s;
 }
 
 .admin-login-button:hover:not(:disabled) {
@@ -257,16 +267,28 @@
 }
 
 .admin-brand-icon {
-  width: 43px;
-  height: 43px;
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
   flex-shrink: 0;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 13px;
-  background: var(--admin-sage-light);
-  color: var(--admin-sage-dark);
-  font-size: 19px;
+
+  overflow: hidden;
+  border-radius: 12px;
+  background: #fffdf9;
+  border: 1px solid var(--admin-border);
+}
+
+.admin-brand-icon img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: center;
+  padding: 3px;
 }
 
 .admin-brand h2 {
@@ -318,7 +340,9 @@
 
   text-align: left;
   font-size: 13px;
-  transition: background 0.18s, color 0.18s;
+  transition:
+    background 0.18s,
+    color 0.18s;
 }
 
 .admin-nav-item > svg {
@@ -445,7 +469,7 @@
 .admin-topbar-heading h1 {
   margin: 0;
   color: var(--admin-text);
-  font-size: 21px;
+  font-size: 24px;
   font-weight: 600;
   letter-spacing: -0.6px;
   line-height: 1.35;
@@ -613,7 +637,7 @@
 }
 
 .admin-welcome-banner h2 {
-  margin: 12px 0 8px;
+  margin: 8px 0;
   color: var(--admin-text);
   font-size: clamp(24px, 2.4vw, 31px);
   font-weight: 600;
@@ -625,7 +649,7 @@
   max-width: 540px;
   margin: 0;
   color: #666b5d;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.8;
 }
 
@@ -658,7 +682,9 @@
   border: 1px solid var(--admin-border);
   border-radius: 12px;
 
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .admin-stat-card:hover {
@@ -700,7 +726,7 @@
   display: block;
   margin-top: 15px;
   color: var(--admin-muted);
-  font-size: 11px;
+  font-size: 16px;
   line-height: 1.5;
 }
 
@@ -719,7 +745,7 @@
   display: block;
   margin-top: 5px;
   color: #918b7e;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.6;
 }
 
@@ -746,7 +772,9 @@
   font-weight: 600;
   white-space: nowrap;
 
-  transition: background 0.2s, border-color 0.2s;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
 }
 
 .admin-refresh-button:hover:not(:disabled),
@@ -918,9 +946,13 @@
 ===================================================== */
 
 .admin-status-select-wrap {
-  width: 140px;
-  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
   position: relative;
+  min-width: 150px;
+  overflow: visible;
 }
 
 .admin-status-select {
@@ -935,6 +967,54 @@
   color: var(--admin-text);
   font-size: 11px !important;
   cursor: pointer;
+}
+
+.admin-status-select-wrap .admin-status-select {
+  width: 100%;
+  min-width: 150px;
+  box-sizing: border-box;
+  padding-right: 30px;
+}
+
+.admin-status-select-wrap .admin-select-chevron {
+  position: absolute;
+  right: 12px;
+  top: 14px;
+  pointer-events: none;
+}
+
+.admin-status-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.admin-status-actions button {
+  padding: 7px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.admin-status-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Prevent status controls from being clipped */
+.admin-table-scroll {
+  overflow-x: auto;
+}
+
+.admin-table td {
+  overflow: visible;
+}
+
+.admin-inbox-actions {
+  overflow: visible;
 }
 
 .admin-status-select:focus {
@@ -1008,7 +1088,9 @@
   background: var(--admin-paper);
   border: 1px solid var(--admin-border);
   border-radius: 11px;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .admin-message-card:hover {
@@ -1602,7 +1684,7 @@
   }
 
   .admin-topbar-heading h1 {
-    font-size: 15px;
+    font-size: 20px;
   }
 
   .admin-profile {
@@ -1648,7 +1730,7 @@
 
   .admin-welcome-banner p {
     max-width: 300px;
-    font-size: 11px;
+    /* font-size: 11px; */
   }
 
   .admin-banner-decoration {
@@ -1676,15 +1758,15 @@
 
   .admin-stat-card > span {
     margin-top: 12px;
-    font-size: 10px;
+    font-size: 14px;
   }
 
   .admin-stat-card > strong {
-    font-size: 21px;
+    font-size: 26px;
   }
 
   .admin-stat-card > small {
-    font-size: 9px;
+    font-size: 10px;
   }
 
   .admin-message-grid {
@@ -1766,7 +1848,7 @@
   }
 
   .admin-topbar-heading h1 {
-    font-size: 13px;
+    font-size: 18px;
   }
 
   .admin-topbar-heading > span {
@@ -1782,7 +1864,7 @@
   }
 
   .admin-stat-card > strong {
-    font-size: 19px;
+    font-size: 24px;
   }
 
   .admin-welcome-banner {
@@ -1832,4 +1914,21 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+.admin-status-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-status-actions button {
+  cursor: pointer;
+}
+
+.admin-status-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }

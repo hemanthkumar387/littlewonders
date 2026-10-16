@@ -13,7 +13,7 @@ import {
   faIndianRupeeSign,
   faEye,
   faEyeSlash,
-  faLeaf,
+//   faLeaf,
   faHeart,
   faPhone,
   faUser,
@@ -114,8 +114,34 @@ const AdminDashboard = () => {
   const [statusFilter, setStatusFilter] = useState("All");
 
   const [updatingItems, setUpdatingItems] = useState({});
+  const [pendingStatuses, setPendingStatuses] = useState({});
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedMessage, setSelectedMessage] = useState(null);
+
+  // When Save/Cancel buttons appear, scroll them into view inside the
+  // relevant scrollable area so they are not hidden below the fold.
+  useEffect(() => {
+    const pendingKeys = Object.keys(pendingStatuses);
+    if (pendingKeys.length === 0) return;
+
+    const latestKey = pendingKeys[pendingKeys.length - 1];
+    const frame = window.requestAnimationFrame(() => {
+      const actionRows = document.querySelectorAll(
+        ".admin-status-actions[data-status-key]",
+      );
+      const target = Array.from(actionRows).find(
+        (element) => element.dataset.statusKey === latestKey,
+      );
+
+      target?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "nearest",
+      });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [pendingStatuses]);
 
   const logout = useCallback(() => {
     sessionStorage.removeItem("littlewonders_admin_token");
@@ -127,6 +153,7 @@ const AdminDashboard = () => {
     setMessages([]);
     setSelectedOrder(null);
     setSelectedMessage(null);
+    setPendingStatuses({});
     setLoginForm({ username: "", password: "" });
     setPageError("");
     setActiveTab("overview");
@@ -271,6 +298,11 @@ const AdminDashboard = () => {
         setSelectedOrder((previous) =>
           previous?._id === id ? { ...previous, status } : previous,
         );
+        setPendingStatuses((previous) => {
+          const next = { ...previous };
+          delete next[key];
+          return next;
+        });
       } else {
         await apiRequest(`/api/admin/messages/${id}/status`, {
           method: "PATCH",
@@ -286,9 +318,16 @@ const AdminDashboard = () => {
         setSelectedMessage((previous) =>
           previous?._id === id ? { ...previous, status } : previous,
         );
+        setPendingStatuses((previous) => {
+          const next = { ...previous };
+          delete next[key];
+          return next;
+        });
       }
+      return true;
     } catch (error) {
       setPageError(error.message || "Unable to update status.");
+      return false;
     } finally {
       setUpdatingItems((previous) => ({
         ...previous,
@@ -390,15 +429,52 @@ const AdminDashboard = () => {
   const renderStatusSelect = (type, item) => {
     const statuses = type === "order" ? ORDER_STATUSES : MESSAGE_STATUSES;
     const key = `${type}-${item._id}`;
+    const currentStatus = item.status || statuses[0];
+    const selectedStatus = pendingStatuses[key] ?? currentStatus;
+    const hasPendingChange = selectedStatus !== currentStatus;
+    const isUpdating = Boolean(updatingItems[key]);
+
+    const handleCancel = () => {
+      setPendingStatuses((previous) => {
+        const next = { ...previous };
+        delete next[key];
+        return next;
+      });
+    };
+
+    const handleSave = async () => {
+      if (!hasPendingChange || isUpdating) return;
+
+      const saved = await updateStatus(type, item._id, selectedStatus);
+
+      // Close the relevant details popup only after the status saves successfully.
+      if (saved && type === "order" && selectedOrder?._id === item._id) {
+        setSelectedOrder(null);
+      }
+      if (saved && type === "message" && selectedMessage?._id === item._id) {
+        setSelectedMessage(null);
+      }
+    };
 
     return (
       <div className="admin-status-select-wrap">
         <select
           className="admin-status-select"
-          value={item.status || statuses[0]}
-          disabled={Boolean(updatingItems[key])}
-          onChange={(event) => updateStatus(type, item._id, event.target.value)}
-          aria-label={`Update ${type} status`}
+          value={selectedStatus}
+          disabled={isUpdating}
+          onChange={(event) => {
+            const newStatus = event.target.value;
+            setPendingStatuses((previous) => {
+              const next = { ...previous };
+              if (newStatus === currentStatus) {
+                delete next[key];
+              } else {
+                next[key] = newStatus;
+              }
+              return next;
+            });
+          }}
+          aria-label={`Select ${type} status`}
         >
           {statuses.map((status) => (
             <option key={status} value={status}>
@@ -411,6 +487,30 @@ const AdminDashboard = () => {
           className="admin-select-chevron"
           icon={faChevronDown}
         />
+
+        {hasPendingChange && (
+          <div
+            className="admin-status-actions"
+            data-status-key={key}
+          >
+            <button
+              type="button"
+              className="admin-secondary-button"
+              disabled={isUpdating}
+              onClick={handleSave}
+            >
+              {isUpdating ? "Saving..." : "Save"}
+            </button>
+            <button
+              type="button"
+              className="admin-secondary-button"
+              disabled={isUpdating}
+              onClick={handleCancel}
+            >
+              Cancel
+            </button>
+          </div>
+        )}
       </div>
     );
   };
@@ -451,18 +551,12 @@ const AdminDashboard = () => {
 
         <form className="admin-login-card" onSubmit={handleLogin}>
           <div className="admin-login-logo">
-            <FontAwesomeIcon icon={faLeaf} />
+            <img src="/images/logo.png" alt="LittleWonders Logo" />
           </div>
 
-          <span className="admin-eyebrow">LITTLEWONDERS MANAGEMENT</span>
-
           <h1>
-            Welcome <span>back.</span>
+            Welcome
           </h1>
-
-          <p className="admin-login-description">
-            Your little corner to manage orders and customer messages.
-          </p>
 
           {loginError && (
             <div className="admin-alert admin-alert-error" role="alert">
@@ -519,12 +613,8 @@ const AdminDashboard = () => {
             className="admin-login-button"
             disabled={loginLoading}
           >
-            {loginLoading ? "Signing in..." : "Sign in to dashboard"}
+            {loginLoading ? "Signing in..." : "Sign in"}
           </button>
-
-          <p className="admin-login-footer">
-            <FontAwesomeIcon icon={faHeart} /> Made with care at LittleWonders
-          </p>
         </form>
       </main>
     );
@@ -548,12 +638,11 @@ const AdminDashboard = () => {
       >
         <div className="admin-brand">
           <div className="admin-brand-icon">
-            <FontAwesomeIcon icon={faLeaf} />
+            <img src="/images/logo.png" alt="LittleWonders Logo" />
           </div>
 
           <div>
             <h2>LittleWonders</h2>
-            <span>Admin studio</span>
           </div>
 
           <button
@@ -638,10 +727,10 @@ const AdminDashboard = () => {
           </button>
 
           <div className="admin-topbar-heading">
-            <span>YOUR LITTLEWONDERS STORE</span>
+            {/* <span>YOUR LITTLEWONDERS STORE</span> */}
             <h1>
               {activeTab === "overview"
-                ? "Good things at a glance"
+                ? "All"
                 : activeTab === "orders"
                   ? "Order management"
                   : "Customer messages"}
@@ -679,8 +768,7 @@ const AdminDashboard = () => {
               <div className="admin-page-intro admin-overview-intro">
                 <div>
                   <span className="admin-eyebrow">YOUR STORE AT A GLANCE</span>
-                  <h2>Welcome to your little studio</h2>
-                  <p>Here's what's happening with your store today.</p>
+                  <h2>Welcome to your little wonders studio</h2>
                 </div>
 
                 {/* Refresh button on the main admin page */}
@@ -689,9 +777,6 @@ const AdminDashboard = () => {
 
               <div className="admin-welcome-banner">
                 <div>
-                  <span className="admin-banner-kicker">
-                    A LITTLE STORE WITH A LOT OF HEART
-                  </span>
                   <h2>Every order tells a story.</h2>
                   <p>
                     Keep track of your creations, customers, and the little
@@ -1262,4 +1347,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default AdminDashboard
