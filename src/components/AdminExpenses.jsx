@@ -269,6 +269,93 @@ const AdminExpenses = () => {
         </div>
       )}
 
+      {/* Financial Summary */}
+      <section className="expense-summary-section">
+        <div className="expense-summary-heading">
+          <h3>Financial Summary</h3>
+          <p>Check your total received, spending and final balance.</p>
+        </div>
+
+        <div className="expense-received-input">
+          <label htmlFor="total-received">Add Amount Received (₹)</label>
+
+          <div className="expense-received-controls">
+            <input
+              id="total-received"
+              type="number"
+              min="0"
+              max="1000000000"
+              step="0.01"
+              placeholder="Enter amount to add"
+              value={totalReceived}
+              onChange={(event) => setTotalReceived(event.target.value)}
+            />
+
+            <button
+              type="button"
+              className="expense-save-button"
+              onClick={saveReceivedAmount}
+              disabled={
+                savingReceived ||
+                loading ||
+                totalReceived.trim() === "" ||
+                Number(totalReceived) <= 0
+              }
+            >
+              <FontAwesomeIcon icon={faFloppyDisk} />
+              {savingReceived ? "Saving..." : "Save"}
+            </button>
+          </div>
+        </div>
+
+        <div className="expense-summary-cards">
+          <div className="expense-summary-card received-card">
+            <div className="expense-summary-card-top">
+              <span>Total Amount Received</span>
+              <div className="expense-summary-icon">
+                <FontAwesomeIcon icon={faIndianRupeeSign} />
+              </div>
+            </div>
+
+            <h2>{formatPrice(received)}</h2>
+          </div>
+
+          <div className="expense-summary-card spent-card">
+            <div className="expense-summary-card-top">
+              <span>Total Amount Spent</span>
+              <div className="expense-summary-icon">
+                <FontAwesomeIcon icon={faMoneyBillTransfer} />
+              </div>
+            </div>
+
+            <h2>{formatPrice(totalSpent)}</h2>
+          </div>
+
+          <div
+            className={`expense-summary-card ${
+              isProfit ? "profit-card" : "loss-card"
+            }`}
+          >
+            <div className="expense-summary-card-top">
+              <span>{isProfit ? "Net Profit" : "Net Loss"}</span>
+
+              <div className="expense-summary-icon">
+                <FontAwesomeIcon icon={faChartLine} />
+              </div>
+            </div>
+
+            <h2>
+              {isProfit ? "" : "-"}
+              {formatPrice(Math.abs(profitOrLoss))}
+            </h2>
+
+            <span className="expense-summary-caption">
+              {isProfit ? "You're making a profit!" : "Expenses exceed income."}
+            </span>
+          </div>
+        </div>
+      </section>
+
       {/* Add Expense */}
       <section className="expense-form-section">
         <div className="expense-section-heading">
@@ -407,93 +494,6 @@ const AdminExpenses = () => {
             </table>
           </div>
         )}
-      </section>
-
-      {/* Financial Summary */}
-      <section className="expense-summary-section">
-        <div className="expense-summary-heading">
-          <h3>Financial Summary</h3>
-          <p>Check your total received, spending and final balance.</p>
-        </div>
-
-        <div className="expense-received-input">
-          <label htmlFor="total-received">Add Amount Received (₹)</label>
-
-          <div className="expense-received-controls">
-            <input
-              id="total-received"
-              type="number"
-              min="0"
-              max="1000000000"
-              step="0.01"
-              placeholder="Enter amount to add"
-              value={totalReceived}
-              onChange={(event) => setTotalReceived(event.target.value)}
-            />
-
-            <button
-              type="button"
-              className="expense-save-button"
-              onClick={saveReceivedAmount}
-              disabled={
-                savingReceived ||
-                loading ||
-                totalReceived.trim() === "" ||
-                Number(totalReceived) <= 0
-              }
-            >
-              <FontAwesomeIcon icon={faFloppyDisk} />
-              {savingReceived ? "Saving..." : "Save"}
-            </button>
-          </div>
-        </div>
-
-        <div className="expense-summary-cards">
-          <div className="expense-summary-card received-card">
-            <div className="expense-summary-card-top">
-              <span>Total Amount Received</span>
-              <div className="expense-summary-icon">
-                <FontAwesomeIcon icon={faIndianRupeeSign} />
-              </div>
-            </div>
-
-            <h2>{formatPrice(received)}</h2>
-          </div>
-
-          <div className="expense-summary-card spent-card">
-            <div className="expense-summary-card-top">
-              <span>Total Amount Spent</span>
-              <div className="expense-summary-icon">
-                <FontAwesomeIcon icon={faMoneyBillTransfer} />
-              </div>
-            </div>
-
-            <h2>{formatPrice(totalSpent)}</h2>
-          </div>
-
-          <div
-            className={`expense-summary-card ${
-              isProfit ? "profit-card" : "loss-card"
-            }`}
-          >
-            <div className="expense-summary-card-top">
-              <span>{isProfit ? "Net Profit" : "Net Loss"}</span>
-
-              <div className="expense-summary-icon">
-                <FontAwesomeIcon icon={faChartLine} />
-              </div>
-            </div>
-
-            <h2>
-              {isProfit ? "" : "-"}
-              {formatPrice(Math.abs(profitOrLoss))}
-            </h2>
-
-            <span className="expense-summary-caption">
-              {isProfit ? "You're making a profit!" : "Expenses exceed income."}
-            </span>
-          </div>
-        </div>
       </section>
     </div>
   );
