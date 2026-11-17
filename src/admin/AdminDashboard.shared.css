@@ -710,7 +710,6 @@
 .admin-detail-section {
   padding: 20px;
   margin-bottom: 20px;
-
   background: #fffefa;
   border: 1px solid #eee7dc;
   border-radius: 13px;
@@ -741,7 +740,7 @@
   margin: 11px 0;
 
   color: #824104;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.8;
   overflow-wrap: anywhere;
   font-weight: bold;
@@ -800,11 +799,11 @@
   }
 }
 
-@media (max-width: 600px) {
+/* @media (max-width: 600px) {
 .admin-detail-section > p {
     font-size: 11px;
   }
-}
+} */
 
 @media (max-width: 600px) {
 .admin-detail-section > p strong {

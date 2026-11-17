@@ -25,6 +25,7 @@
   font-size: 13px;
   font-weight: 650;
   overflow-wrap: anywhere;
+  font-weight: bold;
 }
 
 .admin-order-product > div > small {
@@ -126,7 +127,6 @@
 .admin-order-product > div > strong {
   font-size: 18px;
   line-height: 1.5;
-  font-weight: 700;
 }
 
 .admin-order-product > div > small {

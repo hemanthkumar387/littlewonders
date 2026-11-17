@@ -14,6 +14,12 @@ export default function AdminOverview({ stats, orders, messages, loading, loadDa
     { label: "Order value", value: formatCurrency(stats.revenue), note: "Excludes cancelled orders", icon: faIndianRupeeSign, tone: "gold" },
   ];
 
+  const formatSubject = (subject) => {
+  if (!subject) return "—";
+
+  return subject.replace(/^\[other\]\s*/i, "").trim();
+};
+
   return (
     <>
       <div className="admin-page-intro admin-overview-intro">
@@ -62,7 +68,7 @@ export default function AdminOverview({ stats, orders, messages, loading, loadDa
         {messages.length === 0 ? <EmptyState icon={faEnvelope} message="No customer messages yet." /> : messages.slice(0, 3).map((message) => (
           <button type="button" className="admin-message-card" key={message._id} onClick={() => setSelectedMessage(message)}>
             <div className="admin-message-card-top"><span className="admin-message-avatar">{(message.name || "C").charAt(0).toUpperCase()}</span><StatusBadge status={message.status} /></div>
-            <strong>{message.name}</strong><span className="admin-message-subject">{message.subject}</span><p>{message.message}</p><small>{formatDate(message.createdAt)}</small>
+            <strong>{message.name}</strong><span className="admin-message-subject">{formatSubject(message.subject)}</span><p>{message.message}</p><small>{formatDate(message.createdAt)}</small>
           </button>
         ))}
       </div>

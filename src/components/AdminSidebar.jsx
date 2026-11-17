@@ -1,12 +1,12 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGaugeHigh, faBox, faEnvelope, faHeart, faArrowRightFromBracket, faXmark, faWallet } from "@fortawesome/free-solid-svg-icons";
+import { faGaugeHigh, faCartPlus, faPhone, faHeart, faArrowRightFromBracket, faXmark, faWallet } from "@fortawesome/free-solid-svg-icons";
 import "./AdminSidebar.css";
 
 export default function AdminSidebar({ activeTab, navigateTo, mobileMenuOpen, setMobileMenuOpen, stats, logout }) {
   const navItems = [
     { id: "overview", label: "Overview", icon: faGaugeHigh },
-    { id: "orders", label: "Orders", icon: faBox, count: stats.pendingOrders },
-    { id: "messages", label: "Contact messages", icon: faEnvelope, count: stats.unreadMessages },
+    { id: "orders", label: "Orders", icon: faCartPlus, count: stats.pendingOrders },
+    { id: "messages", label: "Contact messages", icon: faPhone, count: stats.unreadMessages },
     { id: "expenses", label: "Expenses", icon: faWallet },
   ];
   return (
