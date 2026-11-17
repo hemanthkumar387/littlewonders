@@ -471,3 +471,44 @@
     padding: 0 13px;
   }
 }
+
+/* Refresh Button */
+
+.expense-refresh-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 11px 18px;
+  border: 1px solid #d9c8b9;
+  border-radius: 8px;
+  background: #fff;
+  color: #9b634f;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.expense-refresh-button:hover:not(:disabled) {
+  background: #fbf1e6;
+  border-color: #c96f55;
+}
+
+.expense-refresh-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .expenses-heading {
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .expense-refresh-button {
+    padding: 9px 12px;
+    font-size: 12px;
+  }
+}

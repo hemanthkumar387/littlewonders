@@ -8,6 +8,7 @@ import {
   faChartLine,
   faIndianRupeeSign,
   faFloppyDisk,
+  faRotate,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { API_URL, getErrorMessage } from "../utils/adminHelpers";
@@ -230,6 +231,16 @@ const AdminExpenses = () => {
           <h2>Expenses</h2>
           <p>Track your spending and monitor your profits.</p>
         </div>
+
+        <button
+          type="button"
+          className="expense-refresh-button"
+          onClick={loadExpenses}
+          disabled={loading}
+        >
+          <FontAwesomeIcon icon={faRotate} spin={loading} />
+          {loading ? "Refreshing..." : "Refresh"}
+        </button>
       </div>
 
       {error && (
