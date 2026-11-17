@@ -1,0 +1,136 @@
+/* Styles for AdminMessages.jsx */
+
+.admin-inbox-actions {
+  overflow: visible;
+}
+
+.admin-messages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.admin-inbox-card {
+  min-width: 0;
+  padding: 19px;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 14px;
+  background: var(--admin-paper);
+  border: 1px solid var(--admin-border);
+  border-radius: 12px;
+}
+
+.admin-inbox-avatar {
+  width: 39px;
+  height: 39px;
+}
+
+.admin-inbox-content {
+  min-width: 0;
+}
+
+.admin-inbox-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.admin-inbox-top h3 {
+  margin: 0;
+  color: var(--admin-text);
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.admin-inbox-top > div > span {
+  display: block;
+  margin-top: 5px;
+  color: var(--admin-terracotta);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.admin-inbox-message {
+  margin: 12px 0;
+  color: #6f7064;
+  font-size: 12px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.admin-inbox-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px 14px;
+  color: var(--admin-muted);
+  font-size: 10px;
+}
+
+.admin-inbox-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  overflow-wrap: anywhere;
+}
+
+.admin-inbox-meta svg {
+  color: var(--admin-sage);
+}
+
+.admin-inbox-actions {
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 9px;
+}
+
+@media (max-width: 1200px) {
+.admin-inbox-card {
+    grid-template-columns: 39px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 1200px) {
+.admin-inbox-actions {
+    grid-column: 2;
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+}
+
+@media (max-width: 768px) {
+.admin-inbox-card {
+    padding: 14px;
+    grid-template-columns: 35px minmax(0, 1fr);
+    gap: 11px;
+  }
+}
+
+@media (max-width: 768px) {
+.admin-inbox-avatar {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+@media (max-width: 768px) {
+.admin-inbox-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 768px) {
+.admin-inbox-actions {
+    grid-column: 1 / -1;
+  }
+}

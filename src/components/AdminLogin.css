@@ -1,0 +1,142 @@
+/* Styles for AdminLogin.jsx */
+
+.admin-login-card {
+  width: 100%;
+  max-width: 430px;
+  padding: 38px;
+  position: relative;
+  z-index: 1;
+  background: var(--admin-paper);
+  border: 1px solid var(--admin-border);
+  border-radius: 20px;
+  box-shadow: 0 18px 55px rgba(58, 55, 43, 0.08);
+}
+
+.admin-login-logo {
+  width: 100%;
+  height: 80px;
+  margin-bottom: 23px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #fffdf9;
+  
+}
+
+.admin-login-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.admin-login-card h1 {
+  margin: 14px 0 10px;
+  color: var(--admin-text);
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: -1.3px;
+  text-align: center;
+}
+
+.admin-login-card h1 span {
+  color: var(--admin-terracotta);
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.admin-login-card > label {
+  display: block;
+  margin: 17px 0 8px;
+  color: var(--admin-text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.admin-login-card > input,
+.admin-password-field input {
+  width: 100%;
+  height: 47px;
+  padding: 0 13px;
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  outline: none;
+  background: #fffaf5;
+  color: var(--admin-text);
+  font-size: 13px;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.admin-login-card > input:focus,
+.admin-password-field input:focus {
+  border-color: var(--admin-sage);
+  box-shadow: 0 0 0 3px rgba(113, 133, 107, 0.12);
+}
+
+.admin-password-field {
+  position: relative;
+}
+
+.admin-password-field input {
+  padding-right: 45px;
+}
+
+.admin-password-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 43px;
+  height: 47px;
+  border: 0;
+  background: transparent;
+  color: var(--admin-muted);
+}
+
+.admin-login-button {
+  width: 100%;
+  min-height: 47px;
+  margin-top: 25px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--admin-sage-dark);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  transition:
+    background 0.2s,
+    transform 0.2s;
+}
+
+.admin-login-button:hover:not(:disabled) {
+  background: #3e543a;
+  transform: translateY(-1px);
+}
+
+.admin-login-decoration {
+  position: absolute;
+  pointer-events: none;
+  color: rgba(113, 133, 107, 0.14);
+}
+
+.admin-login-decoration-one {
+  top: 8%;
+  left: 8%;
+  font-size: 85px;
+}
+
+.admin-login-decoration-two {
+  right: 8%;
+  bottom: 6%;
+  font-size: 110px;
+}
+
+@media (max-width: 420px) {
+.admin-login-card {
+    padding: 27px 21px;
+  }
+}

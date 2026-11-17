@@ -1,0 +1,134 @@
+/* Styles for StatusSelect.jsx */
+
+.admin-status-select-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  position: relative;
+  min-width: 150px;
+  overflow: visible;
+}
+
+.admin-status-select {
+  width: 100%;
+  min-height: 35px;
+  padding: 7px 27px 7px 9px;
+  appearance: none;
+  border: 1px solid var(--admin-border);
+  border-radius: 7px;
+  outline: none;
+  background: var(--admin-paper);
+  color: var(--admin-text);
+  font-size: 11px !important;
+  cursor: pointer;
+}
+
+.admin-status-select-wrap .admin-status-select {
+  width: 100%;
+  min-width: 150px;
+  box-sizing: border-box;
+  padding-right: 30px;
+}
+
+.admin-status-select-wrap .admin-select-chevron {
+  position: absolute;
+  right: 12px;
+  top: 14px;
+  pointer-events: none;
+}
+
+.admin-status-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.admin-status-actions button {
+  padding: 7px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.admin-status-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-status-select:focus {
+  border-color: var(--admin-sage);
+  box-shadow: 0 0 0 3px rgba(113, 133, 107, 0.1);
+}
+
+.admin-select-chevron {
+  position: absolute;
+  top: 50%;
+  right: 9px;
+  transform: translateY(-50%);
+  color: var(--admin-muted);
+  font-size: 10px;
+  pointer-events: none;
+}
+
+.admin-detail-section .admin-status-select-wrap {
+  width: 100%;
+  max-width: 260px;
+}
+
+.admin-detail-section .admin-status-select {
+  min-height: 42px;
+  padding-left: 13px;
+
+  background: #fff;
+  border: 1px solid #e5dfd3;
+  border-radius: 9px;
+
+  font-size: 12px !important;
+}
+
+.admin-detail-section .admin-status-select:focus {
+  border-color: #71856b;
+  box-shadow: 0 0 0 3px rgba(113, 133, 107, 0.12);
+}
+
+.admin-detail-section .admin-status-actions {
+  gap: 9px;
+  margin-top: 10px;
+}
+
+.admin-detail-section .admin-status-actions button {
+  min-height: 36px;
+  padding: 0 17px;
+
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+
+  transition: all 0.2s ease;
+}
+
+.admin-detail-section .admin-status-actions button:first-child {
+  background: #52694b;
+  border: 1px solid #52694b;
+  color: #fff;
+}
+
+.admin-detail-section .admin-status-actions button:first-child:hover {
+  background: #40583a;
+}
+
+.admin-detail-section .admin-status-actions button:last-child {
+  background: #fff;
+  border: 1px solid #e7ddd1;
+  color: #777064;
+}
+
+.admin-detail-section .admin-status-actions button:last-child:hover {
+  background: #f8eee7;
+  border-color: #e8c6b7;
+  color: #a45f47;
+}

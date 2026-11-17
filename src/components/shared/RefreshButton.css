@@ -1,0 +1,38 @@
+/* Styles for RefreshButton.jsx */
+
+.admin-refresh-button,
+.admin-secondary-button {
+  min-height: 38px;
+  padding: 0 13px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  background: var(--admin-paper);
+  color: var(--admin-sage-dark);
+
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+
+.admin-refresh-button:hover:not(:disabled),
+.admin-secondary-button:hover {
+  border-color: #d3dfcc;
+  background: var(--admin-sage-light);
+}
+
+@media (max-width: 420px) {
+.admin-refresh-button {
+    min-height: 36px;
+    font-size: 11px;
+  }
+}

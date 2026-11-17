@@ -1,0 +1,36 @@
+/* Styles for MessageDetailsModal.jsx */
+
+.admin-message-full {
+  padding: 21px;
+  margin-bottom: 20px;
+
+  background: #f8f4ec;
+  border: 1px solid #eee4d6;
+  border-radius: 13px;
+
+  position: relative;
+}
+
+.admin-message-full > span {
+  color: #71856b;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.7px;
+}
+
+.admin-message-full > p {
+  margin: 14px 0 0;
+
+  color: #55574d;
+  font-size: 13px;
+  line-height: 2;
+
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 600px) {
+.admin-message-full {
+    padding: 17px;
+  }
+}
