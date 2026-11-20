@@ -13,15 +13,19 @@ import AdminMessages from "../components/AdminMessages";
 import OrderDetailsModal from "../components/OrderDetailsModal";
 import MessageDetailsModal from "../components/MessageDetailsModal";
 import AdminExpenses from "../components/AdminExpenses";
+import Review from "../components/ReviewManagement";
 import { API_URL, getErrorMessage } from "../utils/adminHelpers";
+
+const ADMIN_TOKEN_KEY = "littlewonders_admin_token";
+const ADMIN_USERNAME_KEY = "littlewonders_admin_username";
 
 const AdminDashboard = () => {
   // Authentication state
   const [token, setToken] = useState(
-    () => sessionStorage.getItem("littlewonders_admin_token") || "",
+    () => sessionStorage.getItem(ADMIN_TOKEN_KEY) || "",
   );
   const [username, setUsername] = useState(
-    () => sessionStorage.getItem("littlewonders_admin_username") || "",
+    () => sessionStorage.getItem(ADMIN_USERNAME_KEY) || "",
   );
   const [loginForm, setLoginForm] = useState({ username: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
@@ -33,6 +37,7 @@ const AdminDashboard = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [orders, setOrders] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pageError, setPageError] = useState("");
 
@@ -48,30 +53,38 @@ const AdminDashboard = () => {
   useEffect(() => {
     const pendingKeys = Object.keys(pendingStatuses);
     if (pendingKeys.length === 0) return undefined;
+
     const latestKey = pendingKeys[pendingKeys.length - 1];
+
     const frame = window.requestAnimationFrame(() => {
       const actionRows = document.querySelectorAll(
         ".admin-status-actions[data-status-key]",
       );
+
       const target = Array.from(actionRows).find(
         (element) => element.dataset.statusKey === latestKey,
       );
+
       target?.scrollIntoView({
         behavior: "smooth",
         block: "nearest",
         inline: "nearest",
       });
     });
+
     return () => window.cancelAnimationFrame(frame);
   }, [pendingStatuses]);
 
+  // Logout
   const logout = useCallback(() => {
-    sessionStorage.removeItem("littlewonders_admin_token");
-    sessionStorage.removeItem("littlewonders_admin_username");
+    sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+    sessionStorage.removeItem(ADMIN_USERNAME_KEY);
+
     setToken("");
     setUsername("");
     setOrders([]);
     setMessages([]);
+    setReviews([]);
     setSelectedOrder(null);
     setSelectedMessage(null);
     setPendingStatuses({});
@@ -80,6 +93,7 @@ const AdminDashboard = () => {
     setActiveTab("overview");
   }, []);
 
+  // Common authenticated API request
   const apiRequest = useCallback(
     async (endpoint, options = {}) => {
       const response = await fetch(`${API_URL}${endpoint}`, {
@@ -90,28 +104,43 @@ const AdminDashboard = () => {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
       });
+
       if (response.status === 401 || response.status === 403) {
         logout();
         throw new Error("Your admin session has expired. Please log in again.");
       }
-      if (!response.ok) throw new Error(await getErrorMessage(response));
+
+      if (!response.ok) {
+        throw new Error(await getErrorMessage(response));
+      }
+
       return response.json();
     },
     [token, logout],
   );
 
+  // Load dashboard data, including reviews
   const loadDashboard = useCallback(async () => {
     if (!token) return;
+
     setLoading(true);
     setPageError("");
+
     try {
-      const [orderResult, messageResult] = await Promise.all([
+      const [orderResult, messageResult, reviewResult] = await Promise.all([
         apiRequest("/api/admin/orders"),
         apiRequest("/api/admin/messages"),
+        apiRequest("/api/admin/reviews"),
       ]);
+
       setOrders(Array.isArray(orderResult.orders) ? orderResult.orders : []);
+
       setMessages(
         Array.isArray(messageResult.messages) ? messageResult.messages : [],
+      );
+
+      setReviews(
+        Array.isArray(reviewResult.reviews) ? reviewResult.reviews : [],
       );
     } catch (error) {
       setPageError(error.message || "Unable to load dashboard data.");
@@ -120,41 +149,62 @@ const AdminDashboard = () => {
     }
   }, [token, apiRequest]);
 
+  // Automatically load data after login
   useEffect(() => {
     if (!token) return undefined;
+
     let cancelled = false;
+
     Promise.resolve().then(() => {
-      if (!cancelled) void loadDashboard();
+      if (!cancelled) {
+        void loadDashboard();
+      }
     });
+
     return () => {
       cancelled = true;
     };
   }, [token, loadDashboard]);
 
+  // Admin login
   const handleLogin = async (event) => {
     event.preventDefault();
+
     if (loginLoading) return;
+
     setLoginError("");
+
     if (!loginForm.username.trim() || !loginForm.password) {
       setLoginError("Enter your admin username and password.");
       return;
     }
+
     setLoginLoading(true);
+
     try {
       const response = await fetch(`${API_URL}/api/admin/login`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           username: loginForm.username.trim(),
           password: loginForm.password,
         }),
       });
+
       const result = await response.json();
-      if (!response.ok || !result.success || !result.token)
+
+      if (!response.ok || !result.success || !result.token) {
         throw new Error(result.message || "Unable to log in.");
+      }
+
       const loggedInUsername = result.username || loginForm.username.trim();
-      sessionStorage.setItem("littlewonders_admin_token", result.token);
-      sessionStorage.setItem("littlewonders_admin_username", loggedInUsername);
+
+      // Save token using the same key used throughout the dashboard.
+      sessionStorage.setItem(ADMIN_TOKEN_KEY, result.token);
+      sessionStorage.setItem(ADMIN_USERNAME_KEY, loggedInUsername);
+
       setToken(result.token);
       setUsername(loggedInUsername);
       setLoginForm({ username: "", password: "" });
@@ -167,21 +217,30 @@ const AdminDashboard = () => {
     }
   };
 
+  // Update order/message status
   const updateStatus = async (type, id, status) => {
     const key = `${type}-${id}`;
-    setUpdatingItems((previous) => ({ ...previous, [key]: true }));
+
+    setUpdatingItems((previous) => ({
+      ...previous,
+      [key]: true,
+    }));
+
     setPageError("");
+
     try {
       if (type === "order") {
         await apiRequest(`/api/admin/orders/${id}/status`, {
           method: "PATCH",
           body: JSON.stringify({ status }),
         });
+
         setOrders((previous) =>
           previous.map((order) =>
             order._id === id ? { ...order, status } : order,
           ),
         );
+
         setSelectedOrder((previous) =>
           previous?._id === id ? { ...previous, status } : previous,
         );
@@ -190,29 +249,37 @@ const AdminDashboard = () => {
           method: "PATCH",
           body: JSON.stringify({ status }),
         });
+
         setMessages((previous) =>
           previous.map((message) =>
             message._id === id ? { ...message, status } : message,
           ),
         );
+
         setSelectedMessage((previous) =>
           previous?._id === id ? { ...previous, status } : previous,
         );
       }
+
       setPendingStatuses((previous) => {
         const next = { ...previous };
         delete next[key];
         return next;
       });
+
       return true;
     } catch (error) {
       setPageError(error.message || "Unable to update status.");
       return false;
     } finally {
-      setUpdatingItems((previous) => ({ ...previous, [key]: false }));
+      setUpdatingItems((previous) => ({
+        ...previous,
+        [key]: false,
+      }));
     }
   };
 
+  // Dashboard statistics
   const stats = useMemo(() => {
     const revenue = orders
       .filter((order) => order.status !== "Cancelled")
@@ -220,18 +287,22 @@ const AdminDashboard = () => {
 
     return {
       totalOrders: orders.length,
-      pendingOrders: orders.filter((order) => !["Completed", "Cancelled"].includes(order.status))
-        .length,
+      pendingOrders: orders.filter(
+        (order) => !["Completed", "Cancelled"].includes(order.status),
+      ).length,
       unreadMessages: messages.filter((message) => message.status === "Unread")
         .length,
       revenue,
     };
   }, [orders, messages]);
 
+  // Filter orders
   const filteredOrders = useMemo(() => {
     const query = search.trim().toLowerCase();
+
     return orders.filter((order) => {
       const customer = order.customer || {};
+
       const values = [
         order._id,
         customer.name,
@@ -241,11 +312,13 @@ const AdminDashboard = () => {
         customer.pincode,
         ...(order.items || []).map((item) => item.name),
       ];
+
       const matchesSearch =
         !query ||
         values
           .filter(Boolean)
           .some((value) => String(value).toLowerCase().includes(query));
+
       return (
         matchesSearch &&
         (statusFilter === "All" || order.status === statusFilter)
@@ -253,8 +326,10 @@ const AdminDashboard = () => {
     });
   }, [orders, search, statusFilter]);
 
+  // Filter messages
   const filteredMessages = useMemo(() => {
     const query = search.trim().toLowerCase();
+
     return messages.filter((message) => {
       const values = [
         message.name,
@@ -263,11 +338,13 @@ const AdminDashboard = () => {
         message.subject,
         message.message,
       ];
+
       const matchesSearch =
         !query ||
         values
           .filter(Boolean)
           .some((value) => String(value).toLowerCase().includes(query));
+
       return (
         matchesSearch &&
         (statusFilter === "All" || message.status === statusFilter)
@@ -275,6 +352,7 @@ const AdminDashboard = () => {
     });
   }, [messages, search, statusFilter]);
 
+  // Dashboard navigation
   const navigateTo = (tab) => {
     setActiveTab(tab);
     setSearch("");
@@ -285,6 +363,7 @@ const AdminDashboard = () => {
     setPageError("");
   };
 
+  // Login page
   if (!token) {
     return (
       <AdminLogin
@@ -299,6 +378,7 @@ const AdminDashboard = () => {
     );
   }
 
+  // Admin dashboard
   return (
     <main className="admin-shell">
       <AdminSidebar
@@ -309,12 +389,14 @@ const AdminDashboard = () => {
         stats={stats}
         logout={logout}
       />
+
       <section className="admin-main">
         <AdminTopbar
           activeTab={activeTab}
           username={username}
           setMobileMenuOpen={setMobileMenuOpen}
         />
+
         <div className="admin-content">
           {pageError && (
             <div className="admin-alert admin-alert-error" role="alert">
@@ -380,6 +462,16 @@ const AdminDashboard = () => {
 
           {activeTab === "expenses" && <AdminExpenses />}
 
+          {activeTab === "reviews" && (
+            <Review
+              reviews={reviews}
+              setReviews={setReviews}
+              loading={loading}
+              loadDashboard={loadDashboard}
+              apiRequest={apiRequest}
+            />
+          )}
+
           <footer className="admin-footer">
             <span>
               <FontAwesomeIcon icon={faHeart} /> LittleWonders, made with care.
@@ -397,6 +489,7 @@ const AdminDashboard = () => {
         setPendingStatuses={setPendingStatuses}
         updateStatus={updateStatus}
       />
+
       <MessageDetailsModal
         message={selectedMessage}
         onClose={() => setSelectedMessage(null)}
