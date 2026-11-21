@@ -655,3 +655,42 @@
     padding: 0 9px;
   }
 }
+
+
+/* Scrollable review list - approximately 4 cards visible */
+.rm-review-list {
+  max-height: 900px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px 10px 4px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  scrollbar-width: thin;
+  scrollbar-color: #c96f55 #f5e9df;
+}
+
+/* Custom scrollbar - Chrome, Edge and Safari */
+.rm-review-list::-webkit-scrollbar {
+  width: 7px;
+}
+
+.rm-review-list::-webkit-scrollbar-track {
+  background: #f5e9df;
+  border-radius: 10px;
+}
+
+.rm-review-list::-webkit-scrollbar-thumb {
+  background: #c96f55;
+  border-radius: 10px;
+}
+
+.rm-review-list::-webkit-scrollbar-thumb:hover {
+  background: #a9533e;
+}
+
+/* Keep each review card at its natural height */
+.rm-review-card {
+  flex-shrink: 0;
+}

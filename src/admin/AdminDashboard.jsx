@@ -166,6 +166,30 @@ const AdminDashboard = () => {
     };
   }, [token, loadDashboard]);
 
+  // Refresh reviews periodically so the pending count stays updated.
+  const refreshReviews = useCallback(async () => {
+    if (!token) return;
+
+    try {
+      const result = await apiRequest("/api/admin/reviews");
+
+      setReviews(Array.isArray(result.reviews) ? result.reviews : []);
+    } catch (error) {
+      console.error("Unable to refresh reviews:", error);
+    }
+  }, [token, apiRequest]);
+
+  // Check for new reviews every 30 seconds.
+  useEffect(() => {
+    if (!token) return undefined;
+
+    const interval = setInterval(() => {
+      void refreshReviews();
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [token, refreshReviews]);
+
   // Admin login
   const handleLogin = async (event) => {
     event.preventDefault();

@@ -1,4 +1,3 @@
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faGaugeHigh,
@@ -22,10 +21,25 @@ export default function AdminSidebar({
 }) {
   const navItems = [
     { id: "overview", label: "Overview", icon: faGaugeHigh },
-    { id: "orders", label: "Orders", icon: faCartPlus, count: stats.pendingOrders },
-    { id: "messages", label: "Contact messages", icon: faPhone, count: stats.unreadMessages },
+    {
+      id: "orders",
+      label: "Orders",
+      icon: faCartPlus,
+      count: stats.pendingOrders,
+    },
+    {
+      id: "messages",
+      label: "Contact messages",
+      icon: faPhone,
+      count: stats.unreadMessages,
+    },
     { id: "expenses", label: "Expenses", icon: faWallet },
-    { id: "reviews", label: "Customer Reviews", icon: faStar },
+    {
+      id: "reviews",
+      label: "Reviews",
+      icon: faStar,
+      count: stats.pendingReviews,
+    },
   ];
 
   return (
