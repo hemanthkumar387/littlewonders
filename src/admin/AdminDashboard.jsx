@@ -303,6 +303,53 @@ const AdminDashboard = () => {
     }
   };
 
+  // Update order payment details
+  const updatePayment = async (id, paymentStatus, amountPaid) => {
+    const key = `payment-${id}`;
+
+    setUpdatingItems((previous) => ({
+      ...previous,
+      [key]: true,
+    }));
+
+    setPageError("");
+
+    try {
+      const result = await apiRequest(`/api/admin/orders/${id}/payment`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          paymentStatus,
+          amountPaid,
+        }),
+      });
+
+      const updatedPayment = {
+        paymentStatus: result.order?.paymentStatus || paymentStatus,
+        amountPaid: Number(result.order?.amountPaid ?? amountPaid),
+      };
+
+      setOrders((previous) =>
+        previous.map((order) =>
+          order._id === id ? { ...order, ...updatedPayment } : order,
+        ),
+      );
+
+      setSelectedOrder((previous) =>
+        previous?._id === id ? { ...previous, ...updatedPayment } : previous,
+      );
+
+      return true;
+    } catch (error) {
+      setPageError(error.message || "Unable to update payment details.");
+      return false;
+    } finally {
+      setUpdatingItems((previous) => ({
+        ...previous,
+        [key]: false,
+      }));
+    }
+  };
+
   // Dashboard statistics
   const stats = useMemo(() => {
     const revenue = orders
@@ -512,6 +559,7 @@ const AdminDashboard = () => {
         updatingItems={updatingItems}
         setPendingStatuses={setPendingStatuses}
         updateStatus={updateStatus}
+        updatePayment={updatePayment}
       />
 
       <MessageDetailsModal

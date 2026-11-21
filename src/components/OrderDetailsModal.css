@@ -1,18 +1,150 @@
-/* Styles for OrderDetailsModal.jsx */
+
+/* ==================== MODAL ==================== */
+
+.admin-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(38, 31, 26, 0.55);
+  overflow-y: auto;
+}
+
+.admin-detail-modal {
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fffdf9;
+  border: 1px solid #eaded2;
+  border-radius: 18px;
+  box-shadow: 0 18px 55px rgba(45, 32, 23, 0.2);
+}
+
+.admin-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 26px;
+  background: #fbf1e6;
+  border-bottom: 1px solid #eee2d6;
+}
+
+.admin-eyebrow {
+  display: block;
+  margin-bottom: 5px;
+  color: #a17a60;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.admin-modal-header h2 {
+  margin: 0;
+  color: #493b34;
+  font-family: Georgia, serif;
+  font-size: 23px;
+  font-weight: 600;
+}
+
+.admin-icon-button {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  color: #765c4b;
+  background: #fffaf5;
+  border: 1px solid #eaded2;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.admin-icon-button:hover {
+  color: #fff;
+  background: #c96f55;
+  border-color: #c96f55;
+}
+
+.admin-modal-body {
+  padding: 22px 26px 26px;
+  overflow-y: auto;
+}
+
+/* ==================== COMMON SECTIONS ==================== */
+
+.admin-detail-section {
+  padding: 20px;
+  margin-bottom: 18px;
+  background: #fffaf5;
+  border: 1px solid #eee2d6;
+  border-radius: 14px;
+}
+
+.admin-detail-section:last-child {
+  margin-bottom: 0;
+}
+
+.admin-detail-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 16px;
+  color: #403c38;
+  font-family: Georgia, serif;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.admin-detail-section h3 svg {
+  color: #74836a;
+  font-size: 16px;
+}
+
+.admin-detail-section p {
+  margin: 10px 0;
+  color: #66594f;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.admin-detail-section p strong {
+  color: #493b34;
+}
+
+/* ==================== ORDER PRODUCTS ==================== */
+
+.admin-products-section {
+  background: #fbf6ef;
+}
 
 .admin-order-product {
-  padding: 15px 0;
-
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 15px;
-
-  border-bottom: 1px solid #eeeae1;
+  gap: 20px;
+  padding: 16px;
+  margin-bottom: 10px;
+  background: #fffdf9;
+  border: 1px solid #eee2d6;
+  border-radius: 11px;
+  transition: 0.2s ease;
 }
 
 .admin-order-product:last-of-type {
-  border-bottom: 0;
+  margin-bottom: 0;
+}
+
+.admin-order-product:hover {
+  border-color: #e3c9ba;
+  box-shadow: 0 4px 14px rgba(80, 55, 40, 0.06);
 }
 
 .admin-order-product > div {
@@ -21,185 +153,377 @@
 
 .admin-order-product > div > strong {
   display: block;
-  color: #393b32;
-  font-size: 13px;
-  font-weight: 650;
+  color: #403c38;
+  font-size: 15px;
+  line-height: 1.5;
   overflow-wrap: anywhere;
-  font-weight: bold;
 }
 
 .admin-order-product > div > small {
   display: block;
   margin-top: 6px;
-  font-weight: 700;
-  color: #824104;
-  font-size: 11px;
-  line-height: 1.7;
+  color: #98704f;
+  font-size: 12px;
+  line-height: 1.6;
   overflow-wrap: anywhere;
 }
 
 .admin-order-product > strong {
   flex-shrink: 0;
-  color: #52694b;
-  font-size: 13px;
-  font-weight: 700;
+  color: #65775a;
+  font-size: 14px;
+  white-space: nowrap;
 }
 
-.admin-order-total {
-  margin-top: 12px;
-  padding: 17px 16px;
+/* ==================== ORDER TOTAL ==================== */
 
+.admin-order-total {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-
-  background: #edf2e9;
+  margin-top: 15px;
+  padding: 17px;
+  background: #edf1e8;
   border: 1px solid #e0e8d9;
-  border-radius: 10px;
+  border-radius: 11px;
 }
 
 .admin-order-total span {
   color: #59654f;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
 }
 
 .admin-order-total strong {
   color: #435d3d;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.admin-detail-date {
-  margin-top: 15px;
-  color: #898779;
-  font-size: 11px;
-}
-
-@media (max-width: 600px) {
-.admin-order-total {
-    padding: 15px 12px;
-  }
-}
-
-@media (max-width: 600px) {
-.admin-order-total strong {
-    font-size: 16px;
-  }
-}
-
-.admin-detail-section:has(.admin-order-product) {
-  padding: 22px;
-  margin: 10px 0 24px;
-  background: #faf7f0;
-  border: 1px solid #e9e1d5;
-  border-radius: 14px;
-}
-
-.admin-detail-section:has(.admin-order-product) h3 {
-  font-size: 17px;
-  margin-bottom: 20px;
-  gap: 11px;
-}
-
-.admin-order-product {
-  padding: 19px 16px;
-  margin-bottom: 12px;
-  background: #ffffff;
-  border: 1px solid #eee7dc;
-  border-radius: 11px;
-  align-items: center;
-  gap: 20px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.admin-order-product:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 16px rgba(60, 50, 35, 0.07);
-}
-
-.admin-order-product:last-of-type {
-  border-bottom: 1px solid #eee7dc;
-  margin-bottom: 0;
-}
-
-.admin-order-product > div > strong {
   font-size: 18px;
-  line-height: 1.5;
+  font-weight: 800;
 }
 
-.admin-order-product > div > small {
-  margin-top: 8px;
-  font-size: 14px;
-  line-height: 1.7;
+/* ==================== PAYMENT DETAILS ==================== */
+
+.admin-payment-section {
+  background: #fffaf5;
+  border: 1px solid #eaded2;
 }
 
-.admin-order-product > strong {
-  font-size: 16px;
+.admin-payment-section h3 {
+  margin-bottom: 20px;
+}
+
+.admin-payment-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px 15px;
+  margin-bottom: 14px;
+  background: #fffdf9;
+  border: 1px solid #eee5dc;
+  border-radius: 10px;
+}
+
+.admin-payment-row span {
+  color: #75665b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.admin-payment-row strong {
+  color: #493b34;
+  font-size: 15px;
   font-weight: 700;
-  color: #566c4e;
+  text-align: right;
+}
+
+.admin-payment-balance {
+  margin-top: 16px;
+  margin-bottom: 0;
+  background: #edf1e8;
+  border-color: #e0e8d9;
+}
+
+.admin-payment-balance span {
+  color: #59654f;
+}
+
+.admin-payment-balance strong {
+  color: #435d3d;
+  font-size: 17px;
+}
+
+/* Payment input fields */
+
+.admin-payment-field {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.8fr) minmax(0, 1.2fr);
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.admin-payment-field label {
+  color: #594b41;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.admin-payment-field select,
+.admin-payment-field input {
+  width: 100%;
+  min-width: 0;
+  height: 42px;
+  padding: 0 12px;
+  color: #493b34;
+  background: #fffdf9;
+  border: 1px solid #dfd1c5;
+  border-radius: 8px;
+  outline: none;
+  font-family: inherit;
+  font-size: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-payment-field select:focus,
+.admin-payment-field input:focus {
+  border-color: #c96f55;
+  box-shadow: 0 0 0 3px rgba(201, 111, 85, 0.12);
+}
+
+.admin-payment-field select:disabled,
+.admin-payment-field input:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Payment validation */
+
+.admin-payment-error {
+  padding: 10px 12px;
+  margin: 12px 0 0 !important;
+  color: #a94442 !important;
+  background: #fbeceb;
+  border-radius: 8px;
+  font-size: 12px !important;
+}
+
+/* Payment buttons */
+
+.admin-payment-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #eee2d6;
+}
+
+.admin-payment-actions button {
+  min-width: 120px;
+  min-height: 40px;
+  padding: 10px 18px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.admin-payment-cancel {
+  color: #765c4b;
+  background: #fffdf9;
+  border-color: #dfd1c5 !important;
+}
+
+.admin-payment-cancel:hover:not(:disabled) {
+  color: #493b34;
+  background: #f5eee7;
+}
+
+.admin-payment-save {
+  color: #fff;
+  background: #c96f55;
+}
+
+.admin-payment-save:hover:not(:disabled) {
+  background: #ae5b45;
+  transform: translateY(-1px);
+}
+
+.admin-payment-actions button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ==================== PAYMENT STATUS BADGES ==================== */
+
+.admin-payment-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
   white-space: nowrap;
 }
 
-.admin-order-total {
-  margin-top: 17px;
-  padding: 19px 17px;
-  background: #edf1e8;
-  border-radius: 11px;
+.admin-payment-status.paid {
+  color: #54764d;
+  background: #e5efe3;
 }
 
-.admin-order-total span {
-  font-size: 14px;
-  font-weight: 600;
-  color: #555d4d;
+.admin-payment-status.pending,
+.admin-payment-status.unpaid {
+  color: #a87526;
+  background: #fff0d9;
 }
 
-.admin-order-total strong {
-  
-  font-weight: 800;
-  color: #435c3e;
+.admin-payment-status.partial,
+.admin-payment-status.partially-paid {
+  color: #98704f;
+  background: #f8eadf;
 }
+
+.admin-payment-status.failed {
+  color: #b65d51;
+  background: #f8e5e2;
+}
+
+.admin-payment-status.refunded {
+  color: #5472a3;
+  background: #e7edf8;
+}
+
+/* ==================== ORDER DATE ==================== */
+
+.admin-detail-date {
+  margin-top: 15px;
+  color: #898176;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* ==================== RESPONSIVE ==================== */
 
 @media (max-width: 600px) {
-.admin-detail-section:has(.admin-order-product) {
-    padding: 14px;
+  .admin-modal-backdrop {
+    align-items: flex-start;
+    padding: 12px;
   }
-}
 
-@media (max-width: 600px) {
-.admin-order-product {
-    padding: 15px 12px;
+  .admin-detail-modal {
+    max-height: 94vh;
+    border-radius: 14px;
+  }
+
+  .admin-modal-header {
+    padding: 17px 18px;
+  }
+
+  .admin-modal-header h2 {
+    font-size: 20px;
+  }
+
+  .admin-modal-body {
+    padding: 16px;
+  }
+
+  .admin-detail-section {
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+
+  .admin-detail-section h3 {
+    font-size: 16px;
+  }
+
+  .admin-order-product {
+    padding: 13px 11px;
     gap: 12px;
   }
-}
 
-@media (max-width: 600px) {
-.admin-order-product > div > strong {
-    font-size: 18px;
-  }
-}
-
-@media (max-width: 600px) {
-.admin-order-product > div > small {
+  .admin-order-product > div > strong {
     font-size: 14px;
   }
-}
 
-@media (max-width: 600px) {
-.admin-order-product > strong {
-    font-size: 14px;
+  .admin-order-product > div > small {
+    font-size: 11px;
   }
-}
 
-@media (max-width: 600px) {
-.admin-order-total {
-    padding: 16px 13px;
+  .admin-order-product > strong {
+    font-size: 13px;
   }
-}
 
-@media (max-width: 600px) {
-.admin-order-total strong {
+  .admin-order-total {
+    padding: 14px 12px;
+  }
+
+  .admin-order-total strong {
     font-size: 16px;
+  }
+
+  .admin-payment-field {
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+
+  .admin-payment-field select,
+  .admin-payment-field input {
+    height: 44px;
+  }
+
+  .admin-payment-actions {
+    justify-content: stretch;
+  }
+
+  .admin-payment-actions button {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .admin-modal-body {
+    padding: 12px;
+  }
+
+  .admin-detail-section {
+    padding: 13px;
+  }
+
+  .admin-order-product {
+    align-items: flex-start;
+  }
+
+  .admin-order-total {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .admin-payment-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .admin-payment-row strong {
+    text-align: left;
+  }
+
+  .admin-payment-actions {
+    flex-direction: column-reverse;
+  }
+
+  .admin-payment-actions button {
+    width: 100%;
   }
 }
