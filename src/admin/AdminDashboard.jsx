@@ -1,6 +1,9 @@
+
 import { useCallback, useEffect, useMemo, useState } from "react";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faHeart } from "@fortawesome/free-solid-svg-icons";
+
 import "./AdminDashboard.css";
 import "./AdminDashboard.shared.css";
 
@@ -14,100 +17,108 @@ import OrderDetailsModal from "../components/OrderDetailsModal";
 import MessageDetailsModal from "../components/MessageDetailsModal";
 import AdminExpenses from "../components/AdminExpenses";
 import Review from "../components/ReviewManagement";
+
 import { API_URL, getErrorMessage } from "../utils/adminHelpers";
 
-const ADMIN_TOKEN_KEY = "littlewonders_admin_token";
-const ADMIN_USERNAME_KEY = "littlewonders_admin_username";
-
 const AdminDashboard = () => {
-  // Authentication state
-  const [token, setToken] = useState(
-    () => sessionStorage.getItem(ADMIN_TOKEN_KEY) || "",
-  );
-  const [username, setUsername] = useState(
-    () => sessionStorage.getItem(ADMIN_USERNAME_KEY) || "",
-  );
-  const [loginForm, setLoginForm] = useState({ username: "", password: "" });
+  // ==================== AUTHENTICATION STATE ====================
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [username, setUsername] = useState("");
+
+  const [loginForm, setLoginForm] = useState({
+    username: "",
+    password: "",
+  });
+
   const [showPassword, setShowPassword] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
 
-  // Dashboard navigation and data
+  // ==================== DASHBOARD STATE ====================
+
   const [activeTab, setActiveTab] = useState("overview");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const [orders, setOrders] = useState([]);
   const [messages, setMessages] = useState([]);
   const [reviews, setReviews] = useState([]);
+
   const [loading, setLoading] = useState(false);
   const [pageError, setPageError] = useState("");
 
-  // Search, filters, status changes and detail popups
+  // ==================== SEARCH AND FILTER STATE ====================
+
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+
+  // ==================== UPDATE AND MODAL STATE ====================
+
   const [updatingItems, setUpdatingItems] = useState({});
   const [pendingStatuses, setPendingStatuses] = useState({});
+
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedMessage, setSelectedMessage] = useState(null);
 
-  // Keep the Save/Cancel actions visible when a status is changed.
-  useEffect(() => {
-    const pendingKeys = Object.keys(pendingStatuses);
-    if (pendingKeys.length === 0) return undefined;
+  // ==================== LOGOUT ====================
 
-    const latestKey = pendingKeys[pendingKeys.length - 1];
-
-    const frame = window.requestAnimationFrame(() => {
-      const actionRows = document.querySelectorAll(
-        ".admin-status-actions[data-status-key]",
-      );
-
-      const target = Array.from(actionRows).find(
-        (element) => element.dataset.statusKey === latestKey,
-      );
-
-      target?.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "nearest",
+  const logout = useCallback(async () => {
+    try {
+      await fetch(`${API_URL}/api/admin/logout`, {
+        method: "POST",
+        credentials: "include",
       });
-    });
+    } catch (error) {
+      console.error("Admin logout error:", error);
+    }
 
-    return () => window.cancelAnimationFrame(frame);
-  }, [pendingStatuses]);
-
-  // Logout
-  const logout = useCallback(() => {
-    sessionStorage.removeItem(ADMIN_TOKEN_KEY);
-    sessionStorage.removeItem(ADMIN_USERNAME_KEY);
-
-    setToken("");
+    setIsAuthenticated(false);
     setUsername("");
+
     setOrders([]);
     setMessages([]);
     setReviews([]);
+
     setSelectedOrder(null);
     setSelectedMessage(null);
+
     setPendingStatuses({});
-    setLoginForm({ username: "", password: "" });
+    setUpdatingItems({});
+
+    setLoginForm({
+      username: "",
+      password: "",
+    });
+
+    setLoginError("");
     setPageError("");
+
     setActiveTab("overview");
+    setSearch("");
+    setStatusFilter("All");
+
+    window.location.href = "/admin";
   }, []);
 
-  // Common authenticated API request
+  // ==================== COMMON AUTHENTICATED API REQUEST ====================
+
   const apiRequest = useCallback(
     async (endpoint, options = {}) => {
       const response = await fetch(`${API_URL}${endpoint}`, {
         ...options,
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
           ...(options.headers || {}),
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
       });
 
       if (response.status === 401 || response.status === 403) {
-        logout();
-        throw new Error("Your admin session has expired. Please log in again.");
+        void logout();
+
+        throw new Error(
+          "Your admin session has expired. Please log in again."
+        );
       }
 
       if (!response.ok) {
@@ -116,42 +127,105 @@ const AdminDashboard = () => {
 
       return response.json();
     },
-    [token, logout],
+    [logout]
   );
 
-  // Load dashboard data, including reviews
+  // ==================== ADMIN LOGIN ====================
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+
+    if (loginLoading) return;
+
+    setLoginLoading(true);
+    setLoginError("");
+
+    try {
+      const response = await fetch(`${API_URL}/api/admin/login`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginForm),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(
+          result.message || "Invalid username or password."
+        );
+      }
+
+      // The backend stores the JWT in the HTTP-only adminToken cookie.
+      // No JWT is stored in localStorage or sessionStorage.
+
+      setUsername(result.username || loginForm.username);
+      setIsAuthenticated(true);
+
+      setLoginForm({
+        username: "",
+        password: "",
+      });
+
+      setLoginError("");
+
+      // window.location.href = "/dashboard";
+    } catch (error) {
+      setLoginError(
+        error.message || "Unable to sign in. Please try again."
+      );
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
+  // ==================== LOAD DASHBOARD DATA ====================
+
   const loadDashboard = useCallback(async () => {
-    if (!token) return;
+    if (!isAuthenticated) return;
 
     setLoading(true);
     setPageError("");
 
     try {
-      const [orderResult, messageResult, reviewResult] = await Promise.all([
-        apiRequest("/api/admin/orders"),
-        apiRequest("/api/admin/messages"),
-        apiRequest("/api/admin/reviews"),
-      ]);
+      const [orderResult, messageResult, reviewResult] =
+        await Promise.all([
+          apiRequest("/api/admin/orders"),
+          apiRequest("/api/admin/messages"),
+          apiRequest("/api/admin/reviews"),
+        ]);
 
-      setOrders(Array.isArray(orderResult.orders) ? orderResult.orders : []);
+      setOrders(
+        Array.isArray(orderResult.orders)
+          ? orderResult.orders
+          : []
+      );
 
       setMessages(
-        Array.isArray(messageResult.messages) ? messageResult.messages : [],
+        Array.isArray(messageResult.messages)
+          ? messageResult.messages
+          : []
       );
 
       setReviews(
-        Array.isArray(reviewResult.reviews) ? reviewResult.reviews : [],
+        Array.isArray(reviewResult.reviews)
+          ? reviewResult.reviews
+          : []
       );
     } catch (error) {
-      setPageError(error.message || "Unable to load dashboard data.");
+      setPageError(
+        error.message || "Unable to load dashboard data."
+      );
     } finally {
       setLoading(false);
     }
-  }, [token, apiRequest]);
+  }, [isAuthenticated, apiRequest]);
 
-  // Automatically load data after login
+  // Automatically load dashboard data after authentication.
   useEffect(() => {
-    if (!token) return undefined;
+    if (!isAuthenticated) return undefined;
 
     let cancelled = false;
 
@@ -164,84 +238,67 @@ const AdminDashboard = () => {
     return () => {
       cancelled = true;
     };
-  }, [token, loadDashboard]);
+  }, [isAuthenticated, loadDashboard]);
 
-  // Refresh reviews periodically so the pending count stays updated.
+  // ==================== REFRESH REVIEWS ====================
+
   const refreshReviews = useCallback(async () => {
-    if (!token) return;
+    if (!isAuthenticated) return;
 
     try {
       const result = await apiRequest("/api/admin/reviews");
 
-      setReviews(Array.isArray(result.reviews) ? result.reviews : []);
+      setReviews(
+        Array.isArray(result.reviews)
+          ? result.reviews
+          : []
+      );
     } catch (error) {
       console.error("Unable to refresh reviews:", error);
     }
-  }, [token, apiRequest]);
+  }, [isAuthenticated, apiRequest]);
 
-  // Check for new reviews every 30 seconds.
+  // Refresh reviews every 30 seconds.
   useEffect(() => {
-    if (!token) return undefined;
+    if (!isAuthenticated) return undefined;
 
     const interval = setInterval(() => {
       void refreshReviews();
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [token, refreshReviews]);
+  }, [isAuthenticated, refreshReviews]);
 
-  // Admin login
-  const handleLogin = async (event) => {
-    event.preventDefault();
+  // ==================== KEEP SAVE/CANCEL BUTTONS VISIBLE ====================
 
-    if (loginLoading) return;
+  useEffect(() => {
+    const pendingKeys = Object.keys(pendingStatuses);
 
-    setLoginError("");
+    if (pendingKeys.length === 0) return undefined;
 
-    if (!loginForm.username.trim() || !loginForm.password) {
-      setLoginError("Enter your admin username and password.");
-      return;
-    }
+    const latestKey = pendingKeys[pendingKeys.length - 1];
 
-    setLoginLoading(true);
-
-    try {
-      const response = await fetch(`${API_URL}/api/admin/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: loginForm.username.trim(),
-          password: loginForm.password,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok || !result.success || !result.token) {
-        throw new Error(result.message || "Unable to log in.");
-      }
-
-      const loggedInUsername = result.username || loginForm.username.trim();
-
-      // Save token using the same key used throughout the dashboard.
-      sessionStorage.setItem(ADMIN_TOKEN_KEY, result.token);
-      sessionStorage.setItem(ADMIN_USERNAME_KEY, loggedInUsername);
-
-      setToken(result.token);
-      setUsername(loggedInUsername);
-      setLoginForm({ username: "", password: "" });
-    } catch (error) {
-      setLoginError(
-        error.message || "Login failed. Please check your connection.",
+    const frame = window.requestAnimationFrame(() => {
+      const actionRows = document.querySelectorAll(
+        ".admin-status-actions[data-status-key]"
       );
-    } finally {
-      setLoginLoading(false);
-    }
-  };
 
-  // Update order/message status
+      const target = Array.from(actionRows).find(
+        (element) => element.dataset.statusKey === latestKey
+      );
+
+      target?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "nearest",
+      });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [pendingStatuses]);
+
+  // ==================== UPDATE ORDER / MESSAGE STATUS ====================
+
   const updateStatus = async (type, id, status) => {
     const key = `${type}-${id}`;
 
@@ -261,12 +318,16 @@ const AdminDashboard = () => {
 
         setOrders((previous) =>
           previous.map((order) =>
-            order._id === id ? { ...order, status } : order,
-          ),
+            order._id === id
+              ? { ...order, status }
+              : order
+          )
         );
 
         setSelectedOrder((previous) =>
-          previous?._id === id ? { ...previous, status } : previous,
+          previous?._id === id
+            ? { ...previous, status }
+            : previous
         );
       } else {
         await apiRequest(`/api/admin/messages/${id}/status`, {
@@ -276,12 +337,16 @@ const AdminDashboard = () => {
 
         setMessages((previous) =>
           previous.map((message) =>
-            message._id === id ? { ...message, status } : message,
-          ),
+            message._id === id
+              ? { ...message, status }
+              : message
+          )
         );
 
         setSelectedMessage((previous) =>
-          previous?._id === id ? { ...previous, status } : previous,
+          previous?._id === id
+            ? { ...previous, status }
+            : previous
         );
       }
 
@@ -293,7 +358,10 @@ const AdminDashboard = () => {
 
       return true;
     } catch (error) {
-      setPageError(error.message || "Unable to update status.");
+      setPageError(
+        error.message || "Unable to update status."
+      );
+
       return false;
     } finally {
       setUpdatingItems((previous) => ({
@@ -303,7 +371,8 @@ const AdminDashboard = () => {
     }
   };
 
-  // Update order payment details
+  // ==================== UPDATE ORDER PAYMENT ====================
+
   const updatePayment = async (id, paymentStatus, amountPaid) => {
     const key = `payment-${id}`;
 
@@ -315,32 +384,45 @@ const AdminDashboard = () => {
     setPageError("");
 
     try {
-      const result = await apiRequest(`/api/admin/orders/${id}/payment`, {
-        method: "PATCH",
-        body: JSON.stringify({
-          paymentStatus,
-          amountPaid,
-        }),
-      });
+      const result = await apiRequest(
+        `/api/admin/orders/${id}/payment`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({
+            paymentStatus,
+            amountPaid,
+          }),
+        }
+      );
 
       const updatedPayment = {
-        paymentStatus: result.order?.paymentStatus || paymentStatus,
-        amountPaid: Number(result.order?.amountPaid ?? amountPaid),
+        paymentStatus:
+          result.order?.paymentStatus || paymentStatus,
+        amountPaid: Number(
+          result.order?.amountPaid ?? amountPaid
+        ),
       };
 
       setOrders((previous) =>
         previous.map((order) =>
-          order._id === id ? { ...order, ...updatedPayment } : order,
-        ),
+          order._id === id
+            ? { ...order, ...updatedPayment }
+            : order
+        )
       );
 
       setSelectedOrder((previous) =>
-        previous?._id === id ? { ...previous, ...updatedPayment } : previous,
+        previous?._id === id
+          ? { ...previous, ...updatedPayment }
+          : previous
       );
 
       return true;
     } catch (error) {
-      setPageError(error.message || "Unable to update payment details.");
+      setPageError(
+        error.message || "Unable to update payment details."
+      );
+
       return false;
     } finally {
       setUpdatingItems((previous) => ({
@@ -350,24 +432,34 @@ const AdminDashboard = () => {
     }
   };
 
-  // Dashboard statistics
+  // ==================== DASHBOARD STATISTICS ====================
+
   const stats = useMemo(() => {
     const revenue = orders
       .filter((order) => order.status !== "Cancelled")
-      .reduce((sum, order) => sum + (Number(order.total) || 0), 0);
+      .reduce(
+        (sum, order) => sum + (Number(order.total) || 0),
+        0
+      );
 
     return {
       totalOrders: orders.length,
+
       pendingOrders: orders.filter(
-        (order) => !["Completed", "Cancelled"].includes(order.status),
+        (order) =>
+          !["Completed", "Cancelled"].includes(order.status)
       ).length,
-      unreadMessages: messages.filter((message) => message.status === "Unread")
-        .length,
+
+      unreadMessages: messages.filter(
+        (message) => message.status === "Unread"
+      ).length,
+
       revenue,
     };
   }, [orders, messages]);
 
-  // Filter orders
+  // ==================== FILTER ORDERS ====================
+
   const filteredOrders = useMemo(() => {
     const query = search.trim().toLowerCase();
 
@@ -388,16 +480,20 @@ const AdminDashboard = () => {
         !query ||
         values
           .filter(Boolean)
-          .some((value) => String(value).toLowerCase().includes(query));
+          .some((value) =>
+            String(value).toLowerCase().includes(query)
+          );
 
       return (
         matchesSearch &&
-        (statusFilter === "All" || order.status === statusFilter)
+        (statusFilter === "All" ||
+          order.status === statusFilter)
       );
     });
   }, [orders, search, statusFilter]);
 
-  // Filter messages
+  // ==================== FILTER MESSAGES ====================
+
   const filteredMessages = useMemo(() => {
     const query = search.trim().toLowerCase();
 
@@ -414,16 +510,20 @@ const AdminDashboard = () => {
         !query ||
         values
           .filter(Boolean)
-          .some((value) => String(value).toLowerCase().includes(query));
+          .some((value) =>
+            String(value).toLowerCase().includes(query)
+          );
 
       return (
         matchesSearch &&
-        (statusFilter === "All" || message.status === statusFilter)
+        (statusFilter === "All" ||
+          message.status === statusFilter)
       );
     });
   }, [messages, search, statusFilter]);
 
-  // Dashboard navigation
+  // ==================== DASHBOARD NAVIGATION ====================
+
   const navigateTo = (tab) => {
     setActiveTab(tab);
     setSearch("");
@@ -434,8 +534,9 @@ const AdminDashboard = () => {
     setPageError("");
   };
 
-  // Login page
-  if (!token) {
+  // ==================== LOGIN PAGE ====================
+
+  if (!isAuthenticated) {
     return (
       <AdminLogin
         loginForm={loginForm}
@@ -449,7 +550,8 @@ const AdminDashboard = () => {
     );
   }
 
-  // Admin dashboard
+  // ==================== ADMIN DASHBOARD ====================
+
   return (
     <main className="admin-shell">
       <AdminSidebar
@@ -470,8 +572,12 @@ const AdminDashboard = () => {
 
         <div className="admin-content">
           {pageError && (
-            <div className="admin-alert admin-alert-error" role="alert">
+            <div
+              className="admin-alert admin-alert-error"
+              role="alert"
+            >
               <span>{pageError}</span>
+
               <button
                 type="button"
                 onClick={() => setPageError("")}
@@ -531,7 +637,9 @@ const AdminDashboard = () => {
             />
           )}
 
-          {activeTab === "expenses" && <AdminExpenses />}
+          {activeTab === "expenses" && (
+            <AdminExpenses />
+          )}
 
           {activeTab === "reviews" && (
             <Review
@@ -547,6 +655,7 @@ const AdminDashboard = () => {
             <span>
               <FontAwesomeIcon icon={faHeart} /> LittleWonders, made with care.
             </span>
+
             <span>Store administration</span>
           </footer>
         </div>
